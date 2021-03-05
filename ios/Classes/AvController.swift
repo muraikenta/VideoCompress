@@ -7,26 +7,44 @@ class AvController: NSObject {
         return AVURLAsset(url: url)
     }
     
-    public func getTrack(_ asset: AVURLAsset)->AVAssetTrack? {
-        var track : AVAssetTrack? = nil
+    public func getVideoTrack(_ asset: AVURLAsset)->AVAssetTrack? {
+        var videoTrack : AVAssetTrack? = nil
         let group = DispatchGroup()
         group.enter()
         asset.loadValuesAsynchronously(forKeys: ["tracks"], completionHandler: {
             var error: NSError? = nil;
             let status = asset.statusOfValue(forKey: "tracks", error: &error)
             if (status == .loaded) {
-                track = asset.tracks(withMediaType: AVMediaType.video).first
+                videoTrack = asset.tracks(withMediaType: AVMediaType.video).first
             }
             group.leave()
         })
         group.wait()
-        return track
+        return videoTrack
+    }
+    
+    public func getTracks(_ asset: AVURLAsset)->(videoTrack: AVAssetTrack?, audioTrack: AVAssetTrack?) {
+        var videoTrack : AVAssetTrack? = nil
+        var audioTrack : AVAssetTrack? = nil
+        let group = DispatchGroup()
+        group.enter()
+        asset.loadValuesAsynchronously(forKeys: ["tracks"], completionHandler: {
+            var error: NSError? = nil;
+            let status = asset.statusOfValue(forKey: "tracks", error: &error)
+            if (status == .loaded) {
+                videoTrack = asset.tracks(withMediaType: AVMediaType.video).first
+                audioTrack = asset.tracks(withMediaType: AVMediaType.audio).first
+            }
+            group.leave()
+        })
+        group.wait()
+        return (videoTrack, audioTrack)
     }
     
     public func getVideoOrientation(_ path:String)-> Int? {
         let url = Utility.getPathUrl(path)
         let asset = getVideoAsset(url)
-        guard let track = getTrack(asset) else {
+        guard let track = getVideoTrack(asset) else {
             return nil
         }
         let size = track.naturalSize
