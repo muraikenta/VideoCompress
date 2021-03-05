@@ -209,7 +209,7 @@ public class SwiftVideoCompressPlugin: NSObject, FlutterPlugin {
             exporter.timeRange = timeRange
         }
         
-        Utility.deleteFile(compressionUrl.absoluteString)
+        Utility.deleteFile(compressionUrl.absoluteString, clear: true)
         
         let timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateProgress),
                                          userInfo: exporter, repeats: true)
