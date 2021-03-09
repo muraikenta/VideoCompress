@@ -153,7 +153,11 @@ public class SwiftVideoCompressPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func getComposition(_ isIncludeAudio: Bool,_ timeRange: CMTimeRange, _ sourceVideoTrack: AVAssetTrack, _ sourceAudioTrack: AVAssetTrack)->AVAsset {
+    private func getComposition(_ cropEnabled: Bool,_ timeRange: CMTimeRange, _ sourceVideoTrack: AVAssetTrack, _ sourceAudioTrack: AVAssetTrack)->AVAsset {
+        if !cropEnabled {
+            return sourceVideoTrack.asset!
+        }
+
         let composition = AVMutableComposition()
         let compressionVideoTrack = composition.addMutableTrack(withMediaType: AVMediaType.video, preferredTrackID: kCMPersistentTrackID_Invalid)
         let compressionAudioTrack = composition.addMutableTrack(withMediaType: AVMediaType.audio, preferredTrackID: kCMPersistentTrackID_Invalid)
@@ -188,9 +192,9 @@ public class SwiftVideoCompressPlugin: NSObject, FlutterPlugin {
         let cmDurationTime = CMTimeMakeWithSeconds(maxDurationTime, preferredTimescale: timescale)
         let timeRange: CMTimeRange = CMTimeRangeMake(start: cmStartTime, duration: cmDurationTime)
         
-        let isIncludeAudio = includeAudio != nil ? includeAudio! : true
+        let cropEnabled = duration != nil
         
-        let session = getComposition(isIncludeAudio, timeRange, tracks.videoTrack!, tracks.audioTrack!)
+        let session = getComposition(cropEnabled, timeRange, tracks.videoTrack!, tracks.audioTrack!)
         
         let exporter = AVAssetExportSession(asset: session, presetName: getExportPreset(quality))!
         
@@ -204,7 +208,9 @@ public class SwiftVideoCompressPlugin: NSObject, FlutterPlugin {
             exporter.videoComposition = videoComposition
         }
         
-        exporter.timeRange = timeRange
+        if cropEnabled {
+            exporter.timeRange = timeRange
+        }
         
         Utility.deleteFile(compressionUrl.absoluteString, clear: true)
         
