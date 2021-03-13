@@ -24,6 +24,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Future
+import kotlin.math.min
 
 /**
  * VideoCompressPlugin
@@ -130,7 +131,11 @@ class VideoCompressPlugin : MethodCallHandler, FlutterPlugin {
 
                 val dataSource = if (startTime != null || duration != null){
                     val source = UriDataSource(context, Uri.parse(path))
-                    ClipDataSource(source, (1000 * 1000 * (startTime ?: 0)).toLong(), (1000 * 1000 * (duration ?: 0)).toLong())
+                    ClipDataSource(
+                        source,
+                        (1000 * 1000 * (startTime ?: 0)).toLong(),
+                        min((1000 * 1000 * (duration ?: 0)).toLong(), source.getDurationUs())
+                    )
                 }else{
                     UriDataSource(context, Uri.parse(path))
                 }
