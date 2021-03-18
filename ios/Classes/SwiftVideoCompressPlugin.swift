@@ -154,22 +154,7 @@ public class SwiftVideoCompressPlugin: NSObject, FlutterPlugin {
     }
     
     private func getComposition(_ cropEnabled: Bool,_ timeRange: CMTimeRange, _ sourceVideoTrack: AVAssetTrack, _ sourceAudioTrack: AVAssetTrack?)->AVAsset {
-        if !cropEnabled {
-            return sourceVideoTrack.asset!
-        }
-
-        let composition = AVMutableComposition()
-        let compressionVideoTrack = composition.addMutableTrack(withMediaType: AVMediaType.video, preferredTrackID: kCMPersistentTrackID_Invalid)
-        compressionVideoTrack!.preferredTransform = sourceVideoTrack.preferredTransform
-        try? compressionVideoTrack!.insertTimeRange(timeRange, of: sourceVideoTrack, at: CMTime.zero)
-
-        if sourceAudioTrack != nil {
-            let compressionAudioTrack = composition.addMutableTrack(withMediaType: AVMediaType.audio, preferredTrackID: kCMPersistentTrackID_Invalid)
-            compressionAudioTrack!.preferredTransform = sourceAudioTrack!.preferredTransform
-            try? compressionAudioTrack!.insertTimeRange(timeRange, of: sourceAudioTrack!, at: CMTime.zero)
-        }
-        
-        return composition    
+        return sourceVideoTrack.asset!
     }
     
     private func compressVideo(_ path: String,_ quality: NSNumber,_ deleteOrigin: Bool,_ startTime: Double?,
