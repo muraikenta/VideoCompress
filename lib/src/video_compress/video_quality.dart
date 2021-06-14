@@ -1,1 +1,7 @@
-enum VideoQuality { DefaultQuality, LowQuality, MediumQuality, HighestQuality }
+enum VideoQuality {
+  DefaultQuality,
+  LowQuality,
+  MediumQuality,
+  HighQuality,
+  HighestQuality
+}
